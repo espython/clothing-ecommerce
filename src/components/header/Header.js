@@ -1,10 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+
+import { auth } from '../../firebase';
 
 import './HeaderStyles.scss';
 import { ReactComponent as Logo } from '../../assets/crown.svg';
+import CartIcon from '../cart-icon/CartIcon';
+import CartDropDown from '../cart-dropdown/CartDropDown';
 
-export default function Header() {
+function Header({ currentUser, hidden }) {
   return (
     <div className="header">
       <Link className="logo-container" to="/">
@@ -17,7 +22,27 @@ export default function Header() {
         <Link className="option" to="/shop">
           CONTACT
         </Link>
+        {currentUser ? (
+          <div className="option" onClick={() => auth.signOut()}>
+            SIGN OUT
+          </div>
+        ) : (
+          <Link className="option" to="/signin">
+            SIGN IN
+          </Link>
+        )}
+        <CartIcon />
       </div>
+      {hidden ? null : <CartDropDown />}
     </div>
   );
 }
+
+const mapStateToProps = ({ user: { currentUser }, cart: { hidden } }) => {
+  return {
+    currentUser,
+    hidden
+  };
+};
+
+export default connect(mapStateToProps)(Header);
